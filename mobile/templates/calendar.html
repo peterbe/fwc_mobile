@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block header_title_outer %}<h4>{{ calendar_year }} Calendar</h4>{% endblock %}
+
+{% block extrainlinecss %}
+div.event h4 {
+  border-bottom:1px solid #F7A900;
+}
+{% endblock %}
+
+{% block main %}
+
+{% for eventmonth in eventmonths %}
+  <div class="event">
+    <h4>{{ eventmonth.month }}</h4>
+    {% for event in eventmonth.events %}
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <strong>
+        {% if event.one_day %}
+          {{ event.start_date|date:"d" }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {% else %}
+          {{ event.start_date|date:"d" }}-{{ event.end_date|date:"d" }}
+        {% endif %}
+      </strong>
+      <span class="event">{{ event.event }}</span><br />
+    {% endfor %}
+  </div>
+{% endfor %}
+
+{% if whole_year %}
+<p><a href="/calendar/">Calendar for the rest of this year only</a></p>
+{% else %}
+<p>
+  Calendar for whole of 
+  {% for year in whole_year_options %}
+  <a href="/calendar/{{year}}/">{{ year }}</a>
+  {% endfor %}
+</p>
+{% endif %}
+
+{% endblock %}

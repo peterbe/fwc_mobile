@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.1//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <!--
+       Site developed by Peter Bengtsson, peter@fry-it.com
+       of Fry-IT
+       www.fry-it.com 
+  -->
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+    {% load whitespaceoptimize %}
+    {% whitespaceoptimize %}
+    body { background-color:#CBDFEA; margin:0; padding:0; font-family:"Trebuchet MS",Arial,Helvetica,sans-serif }
+    #header { color:white; background-color:#F7A900;border:1px solid #F7A900;}
+    #content { background-color:#CBDFEA; padding:2px;}
+    #navigation {}
+    #footer {background-color:#CBDFEA; font-size:80%}
+    dt { font-weight:bold }
+    dd dl dt { font-weight:normal }
+    {% block extrainlinecss %}{% endblock %}
+    {% endwhitespaceoptimize %}
+    </style>
+    {% block extracss %}{% endblock %}
+    <title>{% block title %}FWC Kung Fu Club{% endblock %}</title>
+  </head>
+  <body>
+    <div id="header">
+      {% block header_title_outer %}<h3>{% block header_title %}FWC Kung Fu Club{% endblock %}</h3>{% endblock %}
+    </div>
+    <div id="content">
+    {% block main %}
+      
+    {% endblock %}
+    </div>
+    <div id="navigation">
+      <a href="/" accesskey="1">Home</a>
+      &nbsp;
+      <a href="/calendar/" accesskey="2">Calendar</a>
+      &nbsp;
+      <a href="/search/" accesskey="3">Search</a>
+    </div>
+    
+    <div id="footer">
+    {% block footer %}
+      &copy; Fujian White Crane Kung Fu
+    {% endblock %}
+    </div>
+    
+{% block extrajs %}
+{% endblock %}
+</body>
+</html>

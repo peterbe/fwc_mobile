@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load whitespaceoptimize %}
+{% block title %}Instructor {{ instructor.full_name }} - {{ block.super }}{% endblock %}
+{% block header_title_outer %}<h4>Instructor {{ instructor.full_name }}</h4>{% endblock %}
+{% load mobile_extras %}
+{% block extracss %}
+<style type="text/css">
+dt { font-weight:bold }
+dd dl dt { font-weight:normal }
+</style>
+{% endblock %}
+
+
+{% block main %}
+
+{% whitespaceoptimize "html" %}
+<p><strong>{{ instructor.full_name }}{#, {{ instructor.type }}#}</strong></p>
+
+<dl>
+
+{% if club %}
+  <dt>Club</dt>
+  <dd><a href="{{ club.get_absolute_url }}">{{ club.name }}</a></dd>
+{% else %}
+  <dt>Clubs</dt>
+  {% for club in clubs %}
+    <dd><a href="{{ club.get_absolute_url }}">{{ club.name }}</a></dd>
+  {% endfor %}
+  
+{% endif %}  
+  
+  {% if instructor.phone %}
+  <dt>Phone</dt>
+  <dd><a href="{{ instructor.phone|tellink }}">{{ instructor.phone }}</a></dd>
+{#  <dd>{{ phone_formatted }}</dd> #}
+{% endif %}
+  
+</dl>
+{% endwhitespaceoptimize %}
+
+<div>{{ instructor.profile|safe }}</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load pagination_tags %}
+
+{% block main %}
+
+{% if last_visited_club %}
+  <dl>
+    <dt>Last visited club:</dt>
+    <dd><a href="{{ last_visited_club.get_absolute_url }}">{{ last_visited_club.name }}</a></dd>
+    
+    {% if last_visited_club_classes_today %}
+      <dt>Classes {{ tonight_or_today}}:</dt>
+      {% for class in last_visited_club_classes_today %}
+        <dd>{{ class.style }},  {{ class.start_time }} - {{ class.end_time }}</dd>
+      {% endfor %}
+    {% endif %}
+    
+  </dl>
+{% endif %}
+
+
+<p><strong>Clubs</strong></p>
+
+<dl>
+  {% autopaginate clubs 5 %}
+  {% for club in clubs %}
+    <dt><a href="{{ club.get_absolute_url }}">{{ club.name }}</a></dt>
+    <dd>{{ club.head_instructor.full_name }}</dd>
+  {% endfor %}
+</dl>
+{% paginate %}
+
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ club.name }} - {{ block.super }}{% endblock %}
+{% block header_title_outer %}<h4>Club {{ club.name }}</h4>{% endblock %}
+{% block extracss %}
+<style type="text/css">
+td.classday { font-weight:bold; padding-top:20px; }
+td.classvenue { }
+</style>
+{% endblock %}
+
+{% block main %}
+
+<dl>
+  <dt>Instructor</dt>
+  <dd><a href="{{ instructor.get_absolute_url }}">{{ instructor.full_name }}</a></dd>
+  
+  {% if assistant_instructor %}
+  <dt>Assistant instructor</dt>
+  <dd><a href="{{ assistant_instructor.get_absolute_url }}">{{ assistant_instructor.full_name }}</a></dd>
+  
+  {% endif %}
+  
+</dl>
+
+{% if announcements %}
+<p><strong>Instructor announcements</strong></p>
+
+<dl>
+{% for announcement in announcements %}
+  <dt>{{ announcement.date|date:"jS F Y" }} </dt>
+  <dd>{{ announcement.announcement }}</dd>
+{% endfor %}
+</dl>
+
+{% endif %}
+
+{% if classes_today %}
+<p><strong>Classes {{ tonight_or_today }} <a href="{{ classes_today_url }}">{% now "l" %} - {{ classes_today_venue }}</a></strong></p>
+
+    <dl>
+    {% for class in classes_today %}
+      {% if class.too_late_today %}
+      <dt style="font-weight:normal">
+        {{ class.style }}
+      </dt>
+      <dd>
+        <strike>{{ class.start_time }} - {{ class.end_time }}</strike>
+	<small>(already started)</small>
+      </dd>
+      {% else %}
+      <dt style="font-weight:normal">
+        {{ class.style }}
+      </dt>
+      <dd>
+        {{ class.start_time }} - {{ class.end_time }}
+      </dd>      
+      {% endif %}
+    {% endfor %}
+    </dl>
+
+{% endif %}
+
+
+<p><strong>Class times</strong></p>
+
+<dl>
+{% for class_day in class_days %}
+  <dt><a href="{{ class_day.day_url }}"><strong>{{ class_day.day }}</strong>
+  - 
+  {{ class_day.venue }}</a></dt>
+  <dd>
+    <a name="{{class_day.day}}"></a>
+    <dl>
+    {% for class in class_day.classes %}
+      <dt>{{ class.style }}</dt>
+      <dd>{{ class.start_time }} - {{ class.end_time }}</dd>
+    {% endfor %}
+    </dl>
+  </dd>
+{% endfor %}
+</dl>
+
+{% endblock %}

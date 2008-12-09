@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block header_title_outer %}<h4>Search {% if searchresults %}results{% endif %}</h4>{% endblock %}
+
+{% block extrainlinecss %}
+p.result a.title { font-weight:bold; }
+{% endblock %}
+
+{% block main %}
+
+<form action="/search/">
+Search: <input id="q" name="q" value="{% if q %}{{ q }}{% endif %}" />
+<input type="submit" value="Go" />
+</form>
+
+{% if searchresults %}
+<p>{{ count_results }} result{{ count_results|pluralize }}</p>
+
+{% for result in searchresults %}
+  <p class="result">
+    <a class="title" href="{{ result.url }}">{{ result.title }}</a> ({{ result.type }})<br/>
+    {% if result.description %}
+    <span>{{ result.description|safe }}</span><br/>
+    {% endif %}
+  </p>
+{% endfor %}
+
+{% else %}
+  {% if q %}
+  <p>Sorry, nothing found.</p>
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}
+
+{% block extrajs %}
+{% if q %}
+{% else %}
+<script type="text/javascript">
+window.onload=function() {
+  document.getElementById('q').focus();
+};
+</script>
+{% endif %}
+{% endblock %}
