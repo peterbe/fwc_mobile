@@ -22,15 +22,13 @@ class ViewsTestCase(unittest.TestCase):
     
     def test_club_page(self):
         """ test rendering the club page """
-        cache.delete('club_page_classes')
-        
         # create a club first
         dave = Instructor.objects.create(full_name=u'Dave Courtney Jones',
                                          first_name=u'Dave',
                                          last_name=u'Courtney Jones')
         
         city = Club.objects.create(head_instructor=dave,
-                                   name=u'City & Islington',
+                                   name=u'FWC City & Islington',
                                    )
                                    
         # and some classes
@@ -50,6 +48,30 @@ class ViewsTestCase(unittest.TestCase):
         assert response.content.count(escape(instructor_url))
         class_day_url = class1.get_absolute_url(without_time=True)
         assert response.content.count(escape(class_day_url))
+        assert not response.content.count('Sparring') 
+        
+        
+        # If you add a new class and re-render the club page for
+        # this club a cache will still only show the one class
+        class2 = ClubClass.objects.create(club=city, 
+                           day=datetime.now().strftime('%A'),
+                           start_time='19:00', end_time='20:00',
+                           address1='Clarmont Hall',
+                           address2='White Lion Street',
+                           style='Sparring')
+
+        response = client.get(club_url)
+        assert response.status_code==200
+        instructor_url = dave.get_absolute_url()
+        assert response.content.count(escape(instructor_url))
+        class_day_url = class1.get_absolute_url(without_time=True)
+        assert response.content.count(escape(class_day_url))
+        
+        #print response.content
+        # The newly added 'Sparring' class shouldn't be there yet
+        # because the page is cached
+        assert response.content.find('Sparring') == -1
+        
         
         # add another club and it shouldn't be there for this club
         eddie = Instructor.objects.create(full_name=u'Eddie Walsh',
@@ -60,7 +82,7 @@ class ViewsTestCase(unittest.TestCase):
                                    name=u'FWC Ireland',
                                    )
         
-        class1 = ClubClass.objects.create(club=city, 
+        ireland_class1 = ClubClass.objects.create(club=ireland,
                            day=datetime.now().strftime('%A'),
                            start_time='18:00', end_time='19:00',
                            address1='Elsewhere',
@@ -73,9 +95,6 @@ class ViewsTestCase(unittest.TestCase):
         assert not response.content.count('Eddie')
         assert not response.content.count('Ireland')
         assert not response.content.count('Elsewhere')
-        
-        
-        
         
                                    
                         

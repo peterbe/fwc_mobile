@@ -85,8 +85,21 @@ def _find_club(name):
     
     return None
 
+def clean_cache_key(key):
+    return key.replace(' ','')
+
+def cache_result(callable, cache_key, timeout=CACHE_TIMEOUT):
+    def inner(*args, **kwargs):
+       result = cache.get(clean_cache_key(cache_key))
+       if result is None:
+           result = callable(*args, **kwargs)
+           cache.set(clean_cache_key(cache_key), result, timeout)
+       return result
+    return inner
+
 
 ## Actual views ################################################################
+
 
 
 @never_cache
@@ -95,11 +108,12 @@ def club_page(request, clubname):
     if club is None:
         raise Http404('Could not find the club')
     
-    classes = cache.get('club_page_classes')
+    cache_key = clean_cache_key('club_page_classes__%s' % club.name)
+    classes = cache.get(cache_key)
     if classes is None:
         classes = ClubClass.objects.filter(club=club).order_by('start_time')
-        cache.set('club_page_classes', classes, CACHE_TIMEOUT)
-        
+        cache.set(cache_key, classes, CACHE_TIMEOUT)
+
     def manual_sort(class1, class2):
         i1 = _weekdays.index(class1.day)
         i2 = _weekdays.index(class2.day)
@@ -149,9 +163,14 @@ def club_page(request, clubname):
 
 def _classes_today(club):
     """ return a tuple of 'classes_today', 'tonight_or_today' """
-    classes_today = ClubClass.objects.filter(club=club, 
+    cache_key = clean_cache_key('club_page_classes__%s' % club.name)
+    classes_today = cache.get(cache_key)
+    if classes_today is None:
+        classes_today = ClubClass.objects.filter(club=club, 
                                              day=datetime.now().strftime('%A')
                                              ).order_by('start_time')
+        cache.set(cache_key, classes_today, CACHE_TIMEOUT)
+    
     tonight_or_today = None
     if classes_today.count():
         classes_today_venue = classes_today[0].address2
