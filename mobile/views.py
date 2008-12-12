@@ -163,7 +163,8 @@ def club_page(request, clubname):
 
 def _classes_today(club):
     """ return a tuple of 'classes_today', 'tonight_or_today' """
-    cache_key = clean_cache_key('club_page_classes__%s' % club.name)
+    cache_key = clean_cache_key('club_page_classes__%s_%s' %\
+      (club.name, datetime.now().strftime('%A')))
     classes_today = cache.get(cache_key)
     if classes_today is None:
         classes_today = ClubClass.objects.filter(club=club, 
