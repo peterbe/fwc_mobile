@@ -161,6 +161,7 @@ def club_page(request, clubname):
     
     return response
 
+
 def _classes_today(club):
     """ return a tuple of 'classes_today', 'tonight_or_today' """
     cache_key = clean_cache_key('club_page_classes__%s_%s' %\
