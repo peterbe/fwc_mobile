@@ -191,8 +191,16 @@ def club_class_day_page(request, clubname, day):
         raise Http404('Could not find the club')
     
     classes = ClubClass.objects.filter(club=club, day__iexact=day).order_by('start_time')
-    first_class = classes[0]
-    instructor = Instructor.objects.get(pk=first_class.club.head_instructor.id)
+    try:
+        first_class = classes[0]
+        instructor = Instructor.objects.get(pk=first_class.club.head_instructor.id)
+    except IndexError:
+        # if this happens, there are no classes on this day and that can happen
+        # if you go to a day that no longer exists (stale URL).
+        #return HttpResponseRedirect(club.get_absolute_url())
+        first_class = None
+    
+    
     
     return _render('club_class_day.html', locals(), request)
     

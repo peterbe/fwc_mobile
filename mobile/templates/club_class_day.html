@@ -5,8 +5,10 @@
 {% block main %}
 
 <dl>
+  {% if instructor %}
   <dt>Instructor</dt>
   <dd><a href="{{ instructor.get_absolute_url }}">{{ instructor.full_name }}</a></dd>
+  {% endif %}
 
   <dt>Classes</dt>
   <dd>
@@ -18,6 +20,8 @@
        {% endfor %}
      </dl>
   </dd>
+
+{% if first_class %}
 
   <dt>Address</dt>
   <dd>
@@ -34,8 +38,13 @@
     <dt>Directions</dt>
     <dd>{{ first_class.directions }}</dd>
   {% endif %}
-  
+{% endif %}
+
 </dl>
+
+{% if not first_class %}
+<p>Sorry, no class on this day.</p>
+{% endif %}
 
 
 <p><a href="{{ club.get_absolute_url }}">Back to {{ club.name }} club page</a></p>
