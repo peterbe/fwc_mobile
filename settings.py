@@ -70,6 +70,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'pagination.middleware.PaginationMiddleware',
     'mobile.middleware.SpacelessMiddleware',
+    'djangobile.middleware.DjangoMobileMiddleware',
     
 )
 
@@ -100,7 +101,17 @@ TEMPLATE_STRING_IF_INVALID = ''
 # if memcache is better. Apparently memcache is ...
 # "By far the fastest, most efficient type of cache available to Django"
 # but why would it be any faster than locmem??
-CACHE_BACKEND = 'locmem:///'
+CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+  'django.core.context_processors.auth',
+  'django.core.context_processors.debug',
+  'django.core.context_processors.i18n',
+  'django.core.context_processors.media',
+  #'djangobile.context_processors.mobile',
+                              
+)
 
 try:
     from settings_local import *

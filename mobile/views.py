@@ -253,7 +253,7 @@ def home_page(request, template_file='home.html'):
         if last_visited_club is not None:
             data['last_visited_club'] = last_visited_club
             data.update(_classes_today(last_visited_club))
-                    
+            
     return _render(template_file, data, request)
 
 @never_cache
