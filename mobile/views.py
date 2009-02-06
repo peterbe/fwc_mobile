@@ -12,6 +12,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.conf import settings
 from django.views.decorators.cache import cache_page, never_cache
 from django.core.cache import cache
+from django.contrib.sites.models import RequestSite
 
 # app
 from mobile.models import Club, ClubClass, Instructor, ClubAnnouncement,\
@@ -391,3 +392,8 @@ def calendar_page(request, calendar_year=None):
     return _render('calendar.html', locals(), request)
 
 
+def all_classes_map(request):
+    google_key = settings.GOOGLEMAPS_API_KEY
+    current_site = RequestSite(request)
+    geo_xml_url = 'http://%s/feeds/all-classes/' % current_site.domain
+    return _render('geomap.html', locals(), request)

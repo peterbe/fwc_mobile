@@ -9,6 +9,7 @@ from django.contrib.gis.feeds import GeoRSSFeed
 #from django.contrib.gis.geos.geometries import Point
 from django.core.cache import cache
 from django.conf import settings
+from django.contrib.sites.models import RequestSite
 
 from models import Club, ClubClass, Instructor
 from views import _get_class_days
@@ -122,7 +123,7 @@ class AllClubClassesFeed(GeoFeed):
     
 WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']    
 def club_classes_geo_feed(request, club=None):
-    from django.contrib.sites.models import Site, RequestSite
+    
     current_site = RequestSite(request)
     feed = GeoRSSFeed(title=u"FWC Kung Fu classes", 
                       link='http://%s/' % current_site.domain,

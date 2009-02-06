@@ -43,4 +43,6 @@ urlpatterns = patterns('',
     #  {'feed_dict': feeds}),
     (r'^feeds/all-classes/', club_classes_geo_feed),
                        
+    (r'map/all-classes/', 'fwc_mobile.mobile.views.all_classes_map'),
+                       
 )
