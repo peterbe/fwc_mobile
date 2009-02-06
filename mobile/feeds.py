@@ -148,7 +148,7 @@ class SimplePoint(object):
 WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
 
 
-@cache_page(60 * 60 * 1) # 1 hour
+@cache_page(60 * 60 * 0) # 1 hour
 def club_classes_geo_feed(request, club=None):
     
     current_site = RequestSite(request)
@@ -212,4 +212,4 @@ def club_classes_geo_feed(request, club=None):
                 import warnings
                 warnings.warn("Unable to find the address for %s" % msg)
     
-    return HttpResponse(feed.writeString('UTF-8'))
+    return HttpResponse(feed.writeString('UTF-8'), mimetype='application/atom+xml')
