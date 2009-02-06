@@ -193,9 +193,19 @@ def club_classes_geo_feed(request, club=None):
         i2 = WEEKDAYS.index(class2.day)
         return cmp(i1, i2)
     
-    for club in Club.objects.all():
+    all_clubs = cache.get('all_clubs')
+    if all_clubs is None:
+        all_clubs = Club.objects.all()
+        cache.set('all_clubs', all_clubs, 3600)
+        
+    for club in all_clubs:
         # now lump the classes together per venue
-        classes = ClubClass.objects.filter(club=club).order_by('start_time')
+        club_classes_cache_key = '%s_clubclasses_ordered_by_start_time' % club.name
+        classes = cache.get(club_classes_cache_key)
+        if classes is None:
+            classes = ClubClass.objects.filter(club=club).order_by('start_time')
+            cache.set(club_classes_cache_key, classes)
+        
         venues = defaultdict(list)
         for class_ in sorted(classes, day_class_sorter):
             addresses = [class_.address1, class_.address2, class_.address3,
