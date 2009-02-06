@@ -120,12 +120,23 @@ class AllClubClassesFeed(GeoFeed):
                                   description=description)
                 
                 yield clubday
+                
+                
+class AddedGeoRSSFeed(GeoRSSFeed):
+    def add_item_elements(self, handler, item):
+        super(AddedGeoRSSFeed, self).add_item_elements(handler, item)
+        self.add_georss_element(handler, item, w3c_geo=True)
+
+class SimplePoint(object):
+    def __init__(self, (x,y)):
+        self.coords = (x,y)
+        self.geom_type = 'Point'
     
 WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']    
 def club_classes_geo_feed(request, club=None):
     
     current_site = RequestSite(request)
-    feed = GeoRSSFeed(title=u"FWC Kung Fu classes", 
+    feed = AddedGeoRSSFeed(title=u"FWC Kung Fu classes", 
                       link='http://%s/' % current_site.domain,
                       description=u"GeoRSS Feed of all FWC Kung fu venues",
                       language=u"en")
@@ -171,6 +182,7 @@ def club_classes_geo_feed(request, club=None):
             
             try:
                 point = _address_list_to_geopoint(venue)
+                p = SimplePoint(point)
                 feed.add_item(title=u"%s at %s" % (club.name, venue_name),
                           link='http://%s%s' % (current_site.domain, club.get_absolute_url()),
                           description=content,
@@ -181,7 +193,5 @@ def club_classes_geo_feed(request, club=None):
                 print
                 import warnings
                 warnings.warn("Unable to find the address for %s" % msg)
-                
-            
     
     return HttpResponse(feed.writeString('UTF-8'))
