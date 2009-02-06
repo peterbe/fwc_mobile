@@ -10,12 +10,17 @@ from django.contrib.gis.feeds import GeoRSSFeed
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
+from django.views.decorators.cache import cache_page, never_cache
 
 from models import Club, ClubClass, Instructor
 from views import _get_class_days
 
 from ukpostcode import valid_uk_postcode, format_uk_postcode
 
+
+# If this is true it will only find those with UK postcodes
+# This means that the searches are going to be much faster
+FIND_ONLY_UK_POSTCODES = True
 
 class AddressNotFound(Exception):
     pass
@@ -38,7 +43,10 @@ def _address_list_to_geopoint(address_bits):
                 address_search = format_uk_postcode(bit)
                 
         if not address_search:
-            address_search = ', '.join(address_bits[2:])
+            if FIND_ONLY_UK_POSTCODES:
+                raise AddressNotFound, ','.join(address_bits)
+            else:
+                address_search = ', '.join(address_bits[2:])
             
         try:
             place, (lat, lng) = geopy_geocode(address_search, 
@@ -132,7 +140,10 @@ class SimplePoint(object):
         self.coords = (x,y)
         self.geom_type = 'Point'
     
-WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']    
+WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
+
+
+@cache_page(60 * 60 * 1) # 1 hour
 def club_classes_geo_feed(request, club=None):
     
     current_site = RequestSite(request)
