@@ -148,8 +148,7 @@ class SimplePoint(object):
 WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
 
 
-#@cache_page(60 * 60 * 0) # 1 hour
-@never_cache
+@cache_page(60 * 60 * 0.1) # 0.1 hour
 def club_classes_geo_feed(request, club=None):
     
     current_site = RequestSite(request)
