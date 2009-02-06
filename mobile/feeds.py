@@ -5,7 +5,7 @@ from collections import defaultdict
 from django.http import HttpResponse
 from django.contrib.syndication.feeds import Feed
 from django.contrib.gis.feeds import Feed as GeoFeed
-from django.contrib.gis.feeds import GeoRSSFeed
+from django.contrib.gis.feeds import GeoRSSFeed, GeoAtom1Feed
 #from django.contrib.gis.geos.geometries import Point
 from django.core.cache import cache
 from django.conf import settings
@@ -139,6 +139,29 @@ class AddedGeoRSSFeed(GeoRSSFeed):
     def add_item_elements(self, handler, item):
         super(AddedGeoRSSFeed, self).add_item_elements(handler, item)
         self.add_georss_element(handler, item, w3c_geo=True)
+        
+    def add_georss_point(self, handler, coords, w3c_geo=False):
+        """
+        Adds a GeoRSS point with the given coords using the given handler.
+        Handles the differences between simple GeoRSS and the more pouplar
+        W3C Geo specification.
+        """
+        if w3c_geo:
+            lon, lat = coords[:2]
+            handler.addQuickElement(u'geo:lat', u'%f' % lat)
+            #handler.addQuickElement(u'geo:lon', u'%f' % lon)
+            handler.addQuickElement(u'geo:long', u'%f' % lon)
+        else:
+            handler.addQuickElement(u'georss:point', self.georss_coords((coords,)))
+            
+class MyGeoAtom1Feed(GeoAtom1Feed):
+    
+    def root_attributes(self):
+        attrs = super(MyGeoAtom1Feed, self).root_attributes()
+        attrs[u'xmlns:georss'] = u'http://www.georss.org/georss'
+        attrs[u'xmlns:geo'] = u'http://www.w3.org/2003/01/geo/wgs84_pos#'
+        return attrs
+        
 
 class SimplePoint(object):
     def __init__(self, (x,y)):
@@ -152,7 +175,11 @@ WEEKDAYS = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Satur
 def club_classes_geo_feed(request, club=None):
     
     current_site = RequestSite(request)
-    feed = AddedGeoRSSFeed(title=u"FWC Kung Fu classes", 
+    #feed = AddedGeoRSSFeed(title=u"FWC Kung Fu classes", 
+    #                  link='http://%s/' % current_site.domain,
+    #                  description=u"GeoRSS Feed of all FWC Kung fu venues",
+    #                  language=u"en")
+    feed = MyGeoAtom1Feed(title=u"FWC Kung Fu classes", 
                       link='http://%s/' % current_site.domain,
                       description=u"GeoRSS Feed of all FWC Kung fu venues",
                       language=u"en")
