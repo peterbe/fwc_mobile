@@ -232,9 +232,13 @@ def club_classes_geo_feed(request, club=None):
                 point = _address_list_to_geopoint(venue)
                 p = SimplePoint(point)
                 feed.add_item(title=u"%s at %s" % (club.name, venue_name),
-                          link='http://%s%s' % (current_site.domain, club.get_absolute_url()),
-                          description=content,
-                          geometry=point)
+                              link='http://%s%s' % (current_site.domain, club.get_absolute_url()),
+                              description=content,
+                              geometry=point,
+                              author_name=club.name,
+                              author_email=u"",
+                              author_link=u"http://%s%s" % (current_site.domain, club.get_absolute_url())
+                              )
             except AddressNotFound, msg:
                 print "PROBLEMS WITH"
                 pprint(venue)
