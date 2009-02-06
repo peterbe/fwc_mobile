@@ -36,6 +36,7 @@ def _address_list_to_geopoint(address_bits):
     in_cache = cache.get(cache_key)
     
     if in_cache is None:
+        print cache_key, "not in cache"
         # first find out if one of the items is a UK postcode
         address_search = None
         for bit in address_bits:
@@ -57,6 +58,8 @@ def _address_list_to_geopoint(address_bits):
         in_cache = (lat, lng)
         # save it in cache
         cache.set(cache_key, in_cache, 3600*24) # 1 day, make it a month?
+    else:
+        print cache_key, "Cached!"
         
     return in_cache
 
