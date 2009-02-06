@@ -131,6 +131,11 @@ class AllClubClassesFeed(GeoFeed):
                 
                 
 class AddedGeoRSSFeed(GeoRSSFeed):
+    def rss_attributes(self):
+        attrs = super(AddedGeoRSSFeed, self).rss_attributes()
+        attrs[u'xmlns:geo'] = u'http://www.w3.org/2003/01/geo/wgs84_pos#'
+        return attrs
+    
     def add_item_elements(self, handler, item):
         super(AddedGeoRSSFeed, self).add_item_elements(handler, item)
         self.add_georss_element(handler, item, w3c_geo=True)
@@ -182,8 +187,10 @@ def club_classes_geo_feed(request, club=None):
             
             if instructor:
                 line = u"<strong>Instructor:</strong> "\
-                        '<a href="%s">%s</a>' % (instructor.get_absolute_url(),
-                                                 instructor.full_name)
+                        '<a href="http://%s%s">%s</a>' % \
+                         (current_site.domain,
+                          instructor.get_absolute_url(),
+                          instructor.full_name)
                 content_lines.append(line)
             for class_ in classes:
                 content_lines.append(u'<strong>%s</strong> %s - %s' % \
