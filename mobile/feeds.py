@@ -1,3 +1,5 @@
+from random import randint
+import re
 from pprint import pprint
 from geopy import geocoders
 from collections import defaultdict
@@ -36,7 +38,6 @@ def _address_list_to_geopoint(address_bits):
     in_cache = cache.get(cache_key)
     
     if in_cache is None:
-        print cache_key, "not in cache"
         # first find out if one of the items is a UK postcode
         address_search = None
         for bit in address_bits:
@@ -58,8 +59,6 @@ def _address_list_to_geopoint(address_bits):
         in_cache = (lat, lng)
         # save it in cache
         cache.set(cache_key, in_cache, 3600*24) # 1 day, make it a month?
-    else:
-        print cache_key, "Cached!"
         
     return in_cache
 
@@ -202,7 +201,6 @@ def club_classes_geo_feed(request, club=None):
         # now lump the classes together per venue
         club_classes_cache_key = '%s_clubclasses_ordered_by_start_time' % club.name
         club_classes_cache_key = club_classes_cache_key.replace(' ','').lower()
-        print "club_classes_cache_key", repr(club_classes_cache_key)
         classes = cache.get(club_classes_cache_key)
         if classes is None:
             classes = ClubClass.objects.filter(club=club).order_by('start_time')
@@ -248,7 +246,7 @@ def club_classes_geo_feed(request, club=None):
                               description=content,
                               geometry=point,
                               author_name=club.name,
-                              author_email=u"",
+                              author_email=instructor.email,
                               author_link=u"http://%s%s" % (current_site.domain, club.get_absolute_url())
                               )
             except AddressNotFound, msg:
@@ -258,4 +256,10 @@ def club_classes_geo_feed(request, club=None):
                 import warnings
                 warnings.warn("Unable to find the address for %s" % msg)
     
-    return HttpResponse(feed.writeString('UTF-8'), mimetype='application/atom+xml')
+    payload = feed.writeString('UTF-8')
+    # because I don't know how to override the the <id> tag it takes the 
+    # URL which isn't necessarily unique and that causes validation errors
+    def subber(match):
+        return str(randint(1000, 99999)) + match.group()
+    payload = re.sub(re.escape('</id>'), subber, payload)
+    return HttpResponse(payload, mimetype='application/atom+xml')
