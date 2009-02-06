@@ -1,5 +1,12 @@
 from django.conf.urls.defaults import *
 
+from feeds import AllClubsFeed, AllClubClassesFeed
+#feeds = {
+#         'all-clubs': AllClubsFeed,
+#         'all-classes': AllClubClassesFeed,
+#         }
+from feeds import club_classes_geo_feed
+
 urlpatterns = patterns('',
 
     (r'^instructor/(?P<fullname>[\w \-\+]+)/$',
@@ -31,4 +38,9 @@ urlpatterns = patterns('',
      
     (r'^paginated/$',
      'fwc_mobile.mobile.views.home_page', dict(template_file='home2.html')),
+                       
+    #(r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+    #  {'feed_dict': feeds}),
+    (r'^feeds/all-classes/', club_classes_geo_feed),
+                       
 )

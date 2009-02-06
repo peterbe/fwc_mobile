@@ -110,10 +110,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
   #'djangobile.context_processors.mobile',
-                              
 )
+
+
 
 try:
     from settings_local import *
 except ImportError:
     pass
+
+try:
+    GOOGLEMAPS_API_KEY
+except NameError:
+    GOOGLEMAPS_API_KEY = open(HOME +'/m.fwckungfu.com.googlemaps_api.key').read()

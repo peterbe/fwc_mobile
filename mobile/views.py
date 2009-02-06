@@ -29,8 +29,6 @@ else:
 
 ## Utility functions ###########################################################
 
- 
-
 def _poor_mans_wordelimiter(word):
     return '%s | %s| %s ' % (re.escape(word), re.escape(word), re.escape(word))
 
@@ -101,19 +99,16 @@ def cache_result(callable, cache_key, timeout=CACHE_TIMEOUT):
 ## Actual views ################################################################
 
 
-
-@never_cache
-def club_page(request, clubname):
-    club = _find_club(clubname)
-    if club is None:
-        raise Http404('Could not find the club')
-    
-    cache_key = clean_cache_key('club_page_classes__%s' % club.name)
-    classes = cache.get(cache_key)
-    if classes is None:
+def _get_class_days(club, use_cache=True):
+    if use_cache:
+        cache_key = clean_cache_key('club_page_classes__%s' % club.name)
+        classes = cache.get(cache_key)
+        if classes is None:
+            classes = ClubClass.objects.filter(club=club).order_by('start_time')
+            cache.set(cache_key, classes, CACHE_TIMEOUT)
+    else:
         classes = ClubClass.objects.filter(club=club).order_by('start_time')
-        cache.set(cache_key, classes, CACHE_TIMEOUT)
-
+    
     def manual_sort(class1, class2):
         i1 = _weekdays.index(class1.day)
         i2 = _weekdays.index(class2.day)
@@ -136,10 +131,18 @@ def club_page(request, clubname):
         i2 = _weekdays.index(item2[0])
         return cmp(i1, i2)
     
-    class_days = [{'day':k, 'classes':v, 'venue':v[0].address2,
-                   'day_url':v[0].get_absolute_url(without_time=True)}
-                  for (k,v) in sorted(_class_days.items(), manual_sort)]
-                  
+    return [{'day':k, 'classes':v, 'venue':v[0].address2,
+             'day_url':v[0].get_absolute_url(without_time=True)}
+            for (k,v) in sorted(_class_days.items(), manual_sort)]
+    
+
+@never_cache
+def club_page(request, clubname):
+    club = _find_club(clubname)
+    if club is None:
+        raise Http404('Could not find the club')
+    
+    class_days = _get_class_days(club)
     
     instructor = Instructor.objects.get(pk=club.head_instructor.id)
     assistant_instructor = None
@@ -386,4 +389,5 @@ def calendar_page(request, calendar_year=None):
         eventmonths.append(dict(month=month, events=month_events))
     
     return _render('calendar.html', locals(), request)
+
 
