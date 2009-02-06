@@ -201,7 +201,8 @@ def club_classes_geo_feed(request, club=None):
     for club in all_clubs:
         # now lump the classes together per venue
         club_classes_cache_key = '%s_clubclasses_ordered_by_start_time' % club.name
-        club_classes_cache_key.replace(' ','').lower()
+        club_classes_cache_key = club_classes_cache_key.replace(' ','').lower()
+        print "club_classes_cache_key", repr(club_classes_cache_key)
         classes = cache.get(club_classes_cache_key)
         if classes is None:
             classes = ClubClass.objects.filter(club=club).order_by('start_time')
