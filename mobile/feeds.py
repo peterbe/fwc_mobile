@@ -56,7 +56,9 @@ def _address_list_to_geopoint(address_bits):
         except ValueError, msg:
             raise AddressNotFound, address_search
         
-        in_cache = (lat, lng)
+        #in_cache = (lat, lng)
+        in_cache = (lng, lat)
+        
         # save it in cache
         cache.set(cache_key, in_cache, 3600*24) # 1 day, make it a month?
         
