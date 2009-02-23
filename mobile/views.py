@@ -187,7 +187,6 @@ def _classes_today(club):
         else:
             classes_today[each.address1] = [each]
         
-    #pprint(classes_today)
     blocks = []
     for classes in classes_today.values():
         #print each.style, each.address1, each.start_time
@@ -204,7 +203,6 @@ def _classes_today(club):
         blocks.append(block)
     
     classes_today = blocks
-    pprint(classes_today)
     return locals()
     
 @cache_page(60 * 60 * 12) # 12 hours
