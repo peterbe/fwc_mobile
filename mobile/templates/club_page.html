@@ -33,12 +33,12 @@ td.classvenue { }
 </dl>
 
 {% endif %}
-
 {% if classes_today %}
-<p><strong>Classes {{ tonight_or_today }} <a href="{{ classes_today_url }}">{% now "l" %} - {{ classes_today_venue }}</a></strong></p>
+{% for each in classes_today %}
+<p><strong>Classes {{ each.tonight_or_today }} <a href="{{ each.classes_today_url }}">{% now "l" %} - {{ each.classes_today_venue }}</a></strong></p>
 
     <dl>
-    {% for class in classes_today %}
+    {% for class in each.classes_today %}
       {% if class.too_late_today %}
       <dt style="font-weight:normal">
         {{ class.style }}
@@ -57,7 +57,7 @@ td.classvenue { }
       {% endif %}
     {% endfor %}
     </dl>
-
+{% endfor %}
 {% endif %}
 
 

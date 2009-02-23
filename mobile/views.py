@@ -1,5 +1,6 @@
 # python
 import re
+from pprint import pprint
 from datetime import datetime, timedelta
 
 # djano
@@ -170,22 +171,40 @@ def _classes_today(club):
     """ return a tuple of 'classes_today', 'tonight_or_today' """
     cache_key = clean_cache_key('club_page_classes__%s_%s' %\
       (club.name, datetime.now().strftime('%A')))
-    classes_today = cache.get(cache_key)
-    if classes_today is None:
-        classes_today = ClubClass.objects.filter(club=club, 
+    _all_classes_today = cache.get(cache_key)
+    if _all_classes_today is None:
+        _all_classes_today = ClubClass.objects.filter(club=club, 
                                              day=datetime.now().strftime('%A')
-                                             ).order_by('start_time')
-        cache.set(cache_key, classes_today, CACHE_TIMEOUT)
+                                             ).order_by('address1','start_time')
+        cache.set(cache_key, _all_classes_today, CACHE_TIMEOUT)
+        
+    # first split them up by address
+    classes_today = {}
     
-    tonight_or_today = None
-    if classes_today.count():
-        classes_today_venue = classes_today[0].address2
-        classes_today_url = classes_today[0].get_absolute_url(without_time=True)
-        tonight_or_today = u'tonight'
-        H,M = [int(x) for x in classes_today[0].start_time.split(':')]
-        if H < 12:
-            tonight_or_today = u'today'
-
+    for each in _all_classes_today:
+        if each.address1 in classes_today:
+            classes_today[each.address1].append(each)
+        else:
+            classes_today[each.address1] = [each]
+        
+    #pprint(classes_today)
+    blocks = []
+    for classes in classes_today.values():
+        #print each.style, each.address1, each.start_time
+        block = {'classes_today':classes}
+        tonight_or_today = None
+        if len(classes):
+            block['classes_today_venue'] = classes[0].address2
+            block['classes_today_url'] = classes[0].get_absolute_url(without_time=True)
+            tonight_or_today = u'tonight'
+            H,M = [int(x) for x in classes[0].start_time.split(':')]
+            if H < 12:
+                tonight_or_today = u'today'
+            block['tonight_or_today'] = tonight_or_today
+        blocks.append(block)
+    
+    classes_today = blocks
+    pprint(classes_today)
     return locals()
     
 @cache_page(60 * 60 * 12) # 12 hours
