@@ -172,7 +172,7 @@ def _classes_today(club):
     cache_key = clean_cache_key('club_page_classes__%s_%s' %\
       (club.name, datetime.now().strftime('%A')))
     _all_classes_today = cache.get(cache_key)
-    if _all_classes_today is None:
+    if 1 or _all_classes_today is None:
         _all_classes_today = ClubClass.objects.filter(club=club, 
                                              day=datetime.now().strftime('%A')
                                              ).order_by('address1','start_time')
