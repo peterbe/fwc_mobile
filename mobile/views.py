@@ -201,7 +201,8 @@ def _classes_today(club):
                 tonight_or_today = u'today'
             block['tonight_or_today'] = tonight_or_today
         blocks.append(block)
-    
+    print "BLOCKS"
+    pprint(blocks)
     classes_today = blocks
     return locals()
     
