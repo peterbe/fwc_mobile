@@ -7,8 +7,11 @@
     <dd><a href="{{ last_visited_club.get_absolute_url }}">{{ last_visited_club.name }}</a></dd>
     
     {% if classes_today %}
-      <dt>Classes {{ tonight_or_today}}:</dt>
-      {% for class in classes_today %}
+    {% for each in classes_today %}
+      
+      <dt>Classes {{ each.tonight_or_today}} at
+      <a href="{{ each.classes_today_url }}">{% now "l" %} - {{ each.classes_today_venue }}</a>:</dt>
+      {% for class in each.classes_today %}
         <dd>{{ class.style }},
         {% if class.too_late_today %}
           <strike>{{ class.start_time }} - {{ class.end_time }}</strike>
@@ -19,6 +22,8 @@
         
         </dd>
       {% endfor %}
+      
+    {% endfor %}
     {% endif %}
     
   </dl>

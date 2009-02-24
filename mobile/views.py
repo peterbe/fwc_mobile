@@ -172,7 +172,7 @@ def _classes_today(club):
     cache_key = clean_cache_key('club_page_classes__%s_%s' %\
       (club.name, datetime.now().strftime('%A')))
     _all_classes_today = cache.get(cache_key)
-    if 1 or _all_classes_today is None:
+    if _all_classes_today is None:
         _all_classes_today = ClubClass.objects.filter(club=club, 
                                              day=datetime.now().strftime('%A')
                                              ).order_by('address1','start_time')
@@ -201,8 +201,8 @@ def _classes_today(club):
                 tonight_or_today = u'today'
             block['tonight_or_today'] = tonight_or_today
         blocks.append(block)
-    print "BLOCKS"
-    pprint(blocks)
+    #print "BLOCKS"
+    #pprint(blocks)
     classes_today = blocks
     return locals()
     
