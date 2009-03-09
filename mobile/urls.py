@@ -6,11 +6,12 @@ from feeds import AllClubsFeed, AllClubClassesFeed
 #         'all-classes': AllClubClassesFeed,
 #         }
 from feeds import club_classes_geo_feed
+from views import *
 
 urlpatterns = patterns('',
 
     (r'^instructor/(?P<fullname>[\w \-\+]+)/$',
-     'fwc_mobile.mobile.views.instructor_page'),
+     instructor_page),
 
     (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/$',
      'fwc_mobile.mobile.views.club_page'),
@@ -30,8 +31,7 @@ urlpatterns = patterns('',
     (r'^search/$',
      'fwc_mobile.mobile.views.search_page'),
      
-    (r'^/?$',
-     'fwc_mobile.mobile.views.home_page'),
+    (r'^/?$', home_page),
      
     (r'^p/$',
      'fwc_mobile.mobile.views.home_page', dict(template_file='home2.html')),
@@ -44,5 +44,7 @@ urlpatterns = patterns('',
     (r'^feeds/all-classes/', club_classes_geo_feed),
                        
     (r'map/all-classes/', 'fwc_mobile.mobile.views.all_classes_map'),
+
+    (r'calendar.ics$', icalendar),
                        
 )

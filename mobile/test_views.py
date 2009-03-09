@@ -175,6 +175,39 @@ class ViewsTestCase(TestCase):
         
         assert '<georss:point>-0.083693 51.529435</georss:point>' in res.content
         
+        
+    def test_icalendar(self):
+        """test icalendar() """
+        
+        yyyy = datetime.today().year
+        Calendar.objects.create(event='Crete',
+                                start_date=datetime(yyyy, 12, 30),
+                                end_date=datetime(yyyy, 12, 31))
+        
+        Calendar.objects.create(event='KF Camp',
+                                start_date=datetime(yyyy, 12, 29),
+                                end_date=datetime(yyyy, 12, 29))
+        
+        # add an even that happened yesterday
+        yesterday = datetime.today() - timedelta(days=1)
+        Calendar.objects.create(event='Dinner',
+                                start_date=yesterday,
+                                end_date=yesterday)
+
+        client = Client()
+        res = client.get('/icalendar.ics')
+        print res.content
+        
+        assert '%s1229' % yyyy in res.content
+        assert '%s1231' % yyyy in res.content
+        assert 'Crete' in res.content
+        assert 'KF Camp' in res.content
+        
+        # order is so that youngest first
+        assert res.content.find('KF Camp') < res.content.find('Crete')
+        
+        assert 'Dinner' not in res.content # because it's too old
+        
 
         
 
