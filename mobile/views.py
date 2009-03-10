@@ -417,6 +417,7 @@ def all_classes_map(request):
     return _render('geomap.html', locals(), request)
 
 
+@cache_page(60 * 60 * 1) # 1 hour
 def icalendar(request):
     from icalendar import Calendar as iCalendar
     from icalendar import Event
