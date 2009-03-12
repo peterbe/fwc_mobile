@@ -422,10 +422,10 @@ def icalendar(request):
     from icalendar import Calendar as iCalendar
     from icalendar import Event
     from datetime import datetime, date
-    from icalendar import UTC # timezone
+    #from icalendar import UTC # timezone
     cal = iCalendar()
     cal.add('prodid', '-//FWC Kung Fu Calendar //m.fwckungfu.com')
-    cal.add('version', '2.0')
+    cal.add('version', '2.1')
     cal.add('x-wr-calname', 'FWC Kung Fu Calendar')
     
     yyyy = datetime.today().year
@@ -435,15 +435,16 @@ def icalendar(request):
         #print entry.start_date, entry.event
         event.add('summary', entry.event)
         st = entry.start_date
-        #event.add('dtstart', date(st.year, st.month, st.day))
-        event.add('dtstart', datetime(st.year, st.month, st.day, 0, 0, 0, tzinfo=UTC))
+        event.add('dtstart', date(st.year, st.month, st.day))
+        #event.add('dtstart', datetime(st.year, st.month, st.day, 0, 0, 0, tzinfo=UTC))
         et = entry.end_date
-        #event.add('dtend', date(et.year, et.month, et.day))
-        event.add('dtend', datetime(et.year, et.month, et.day,0,0,0,tzinfo=UTC))
-        event.add('dtstamp', datetime(st.year, st.month, st.day, 0,0,0,tzinfo=UTC))
-        event['uid'] = 'fwccalendar-%s' % entry.id
+        event.add('dtend', date(et.year, et.month, et.day))
+        #event.add('dtend', datetime(et.year, et.month, et.day,0,0,0,tzinfo=UTC))
+        #event.add('dtend', 'TZID=UTC;VALUE=DATE:' + et.strftime('%Y%m%d')) # DOESNOT WORK!
+                  
+        event.add('dtstamp', date(st.year, st.month, st.day))
+        event['uid'] = 'fwccalendar2.1-%s' % entry.id
         cal.add_component(event)
     
-    
-    
     return HttpResponse(cal.as_string(), content_type='text/calendar;charset=utf-8')
+    #return HttpResponse(cal.as_string(), content_type='text/plain')
