@@ -425,7 +425,7 @@ def icalendar(request):
     #from icalendar import UTC # timezone
     cal = iCalendar()
     cal.add('prodid', '-//FWC Kung Fu Calendar //m.fwckungfu.com')
-    cal.add('version', '2.1')
+    cal.add('version', '2.2')
     cal.add('x-wr-calname', 'FWC Kung Fu Calendar')
     
     yyyy = datetime.today().year
@@ -447,7 +447,7 @@ def icalendar(request):
         #event.add('dtend', 'TZID=UTC;VALUE=DATE:' + et.strftime('%Y%m%d')) # DOESNOT WORK!
                   
         event.add('dtstamp', date(st.year, st.month, st.day))
-        event['uid'] = 'fwccalendar2.1-%s' % entry.id
+        event['uid'] = 'fwccalendar2.2-%s' % entry.id
         cal.add_component(event)
     
     as_string = cal.as_string()
