@@ -417,7 +417,7 @@ def all_classes_map(request):
     return _render('geomap.html', locals(), request)
 
 
-@cache_page(60 * 60 * 1) # 1 hour
+@cache_page(60 * 60 * 0) # 1 hour
 def icalendar(request):
     from icalendar import Calendar as iCalendar
     from icalendar import Event
@@ -429,16 +429,20 @@ def icalendar(request):
     cal.add('x-wr-calname', 'FWC Kung Fu Calendar')
     
     yyyy = datetime.today().year
-    filter_ = dict(start_date__year=yyyy, start_date__gte=datetime.today())
+    #filter_ = dict(start_date__year=yyyy, start_date__gte=datetime.today())
+    filter_ = dict()
+    all_datestrings = set()
     for entry in Calendar.objects.filter(**filter_).order_by('start_date'):
         event = Event()
         #print entry.start_date, entry.event
         event.add('summary', entry.event)
         st = entry.start_date
         event.add('dtstart', date(st.year, st.month, st.day))
+        all_datestrings.add(st.strftime('%Y%m%d'))
         #event.add('dtstart', datetime(st.year, st.month, st.day, 0, 0, 0, tzinfo=UTC))
         et = entry.end_date
         event.add('dtend', date(et.year, et.month, et.day))
+        all_datestrings.add(et.strftime('%Y%m%d'))
         #event.add('dtend', datetime(et.year, et.month, et.day,0,0,0,tzinfo=UTC))
         #event.add('dtend', 'TZID=UTC;VALUE=DATE:' + et.strftime('%Y%m%d')) # DOESNOT WORK!
                   
@@ -446,5 +450,10 @@ def icalendar(request):
         event['uid'] = 'fwccalendar2.1-%s' % entry.id
         cal.add_component(event)
     
-    return HttpResponse(cal.as_string(), content_type='text/calendar;charset=utf-8')
-    #return HttpResponse(cal.as_string(), content_type='text/plain')
+    as_string = cal.as_string()
+    for datestring in all_datestrings:
+        as_string = as_string.replace(':%s' % datestring, 
+                                      'TZID=UTC;VALUE=DATE:%s' % datestring)
+        
+    return HttpResponse(as_string, content_type='text/calendar;charset=utf-8')
+    #return HttpResponse(as_string, content_type='text/plain')
