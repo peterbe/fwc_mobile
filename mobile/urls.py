@@ -45,6 +45,6 @@ urlpatterns = patterns('',
                        
     (r'map/all-classes/', 'fwc_mobile.mobile.views.all_classes_map'),
 
-    (r'calendar.ics$', icalendar),
+    (r'^calendar.ics$', icalendar),
                        
 )
