@@ -422,15 +422,15 @@ def icalendar(request):
     from icalendar import Calendar as iCalendar
     from icalendar import Event
     from datetime import datetime, date
-    #from icalendar import UTC # timezone
+    from icalendar import UTC # timezone
     cal = iCalendar()
     cal.add('prodid', '-//FWC Kung Fu Calendar //m.fwckungfu.com')
-    cal.add('version', '2.3')
+    cal.add('version', '2.4')
     cal.add('x-wr-calname', 'FWC Kung Fu Calendar')
     
     yyyy = datetime.today().year
-    filter_ = dict(start_date__year=yyyy, start_date__gte=datetime.today())
-    #filter_ = dict()
+    #filter_ = dict(start_date__year=yyyy, start_date__gte=datetime.today())
+    filter_ = dict()
     all_datestrings = set()
     for entry in Calendar.objects.filter(**filter_).order_by('start_date'):
         event = Event()
@@ -446,8 +446,8 @@ def icalendar(request):
         #event.add('dtend', datetime(et.year, et.month, et.day,0,0,0,tzinfo=UTC))
         #event.add('dtend', 'TZID=UTC;VALUE=DATE:' + et.strftime('%Y%m%d')) # DOESNOT WORK!
                   
-        event.add('dtstamp', date(st.year, st.month, st.day))
-        event['uid'] = 'fwccalendar2.3-%s' % entry.id
+        event.add('dtstamp', datetime(st.year, st.month, st.day, 0, 0, 0, tzinfo=UTC))
+        event['uid'] = 'fwccalendar2.4-%s' % entry.id
         cal.add_component(event)
 
     as_string = cal.as_string()
