@@ -17,7 +17,10 @@ urlpatterns = patterns('',
      'fwc_mobile.mobile.views.club_page'),
      
     (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/(?P<day>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/$',
-     'fwc_mobile.mobile.views.club_class_day_page'),     
+     'fwc_mobile.mobile.views.club_class_day_page'),
+                       
+    (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/(?P<day>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/(?P<classid>\d+)/$',
+     'fwc_mobile.mobile.views.club_class_day_page'),
 
     (r'^clubs/$',
      'fwc_mobile.mobile.views.clubs_page'),

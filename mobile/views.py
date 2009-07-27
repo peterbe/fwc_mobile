@@ -123,17 +123,20 @@ def _get_class_days(club, use_cache=True):
     # lump them by day
     _class_days = {}
     for klass in classes:
-        if klass.day in _class_days:
-            _class_days[klass.day].append(klass)
+        key = "%s %s %s" % (klass.day, klass.address1, klass.address2)
+        if key in _class_days:
+            _class_days[key].append(klass)
         else:
-            _class_days[klass.day] = [klass]
+            _class_days[key] = [klass]
             
     def manual_sort(item1, item2):
-        i1 = _weekdays.index(item1[0])
-        i2 = _weekdays.index(item2[0])
+        i1 = _weekdays.index(item1[0].split()[0])
+        i2 = _weekdays.index(item2[0].split()[0])
         return cmp(i1, i2)
     
-    return [{'day':k, 'classes':v, 'venue':v[0].address2,
+    return [{'day':k.split()[0],
+             'classes':v, 
+             'venue':v[0].address2,
              'day_url':v[0].get_absolute_url(without_time=True)}
             for (k,v) in sorted(_class_days.items(), manual_sort)]
     
@@ -145,6 +148,8 @@ def club_page(request, clubname):
         raise Http404('Could not find the club')
     
     class_days = _get_class_days(club)
+    from pprint import pprint
+    pprint(class_days)
     
     instructor = Instructor.objects.get(pk=club.head_instructor.id)
     assistant_instructor = None
@@ -194,7 +199,8 @@ def _classes_today(club):
         tonight_or_today = None
         if len(classes):
             block['classes_today_venue'] = classes[0].address2
-            block['classes_today_url'] = classes[0].get_absolute_url(without_time=True)
+            block['classes_today_url'] = classes[0].get_absolute_url(without_time=True)\
+              + '%s/' % classes[0].id
             tonight_or_today = u'tonight'
             H,M = [int(x) for x in classes[0].start_time.split(':')]
             if H < 12:
@@ -207,12 +213,22 @@ def _classes_today(club):
     return locals()
     
 @cache_page(60 * 60 * 12) # 12 hours
-def club_class_day_page(request, clubname, day):
+def club_class_day_page(request, clubname, day, classid=None):
     club = _find_club(clubname)
     if club is None:
         raise Http404('Could not find the club')
     
-    classes = ClubClass.objects.filter(club=club, day__iexact=day).order_by('start_time')
+    if classid:
+        class_ = ClubClass.objects.get(pk=classid)
+        classes = ClubClass.objects.filter(club=class_.club,
+                                           day=class_.day,
+                                           address1=class_.address1,
+                                           address2=class_.address2)
+        
+    else:
+        # The desperate way of doing it
+        classes = ClubClass.objects.filter(club=club, day__iexact=day).order_by('start_time')
+            
     try:
         first_class = classes[0]
         instructor = Instructor.objects.get(pk=first_class.club.head_instructor.id)
@@ -221,9 +237,7 @@ def club_class_day_page(request, clubname, day):
         # if you go to a day that no longer exists (stale URL).
         #return HttpResponseRedirect(club.get_absolute_url())
         first_class = None
-    
-    
-    
+
     return _render('club_class_day.html', locals(), request)
     
 

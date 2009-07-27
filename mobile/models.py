@@ -117,6 +117,10 @@ class ClubClass(models.Model):
             url += '%s/%s/' % (self.start_time, self.end_time)
         return url
     
+    def __unicode__(self):
+        return "%s: %s (%s-%s) %s" % \
+          (self.club, self.day, self.start_time, self.end_time, self.address2)
+
     def too_late_today(self):
         
         _hour_start, _min_start = [int(x) for x in self.start_time.split(':')]
