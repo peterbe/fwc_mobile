@@ -470,5 +470,9 @@ def icalendar(request):
         as_string = as_string.replace(':%s' % datestring, 
                                       ';TZID=UTC;VALUE=DATE:%s' % datestring)
         
-    return HttpResponse(as_string, content_type='text/calendar;charset=utf-8')
+    as_string = as_string.replace("\r","")
+    response = HttpResponse(as_string, mimetype='text/calendar')
+    response['Content-Disposition']='attachment; filename="%s"' % 'calendar.ics'
+    return response
+    #return HttpResponse(as_string, content_type='text/calendar;charset=utf-8')
     #return HttpResponse(as_string, content_type='text/plain')
