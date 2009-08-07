@@ -8,6 +8,8 @@ from feeds import AllClubsFeed, AllClubClassesFeed
 from feeds import club_classes_geo_feed
 from views import *
 
+DAYS = 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday'
+
 urlpatterns = patterns('',
 
     (r'^instructor/(?P<fullname>[\w \-\+]+)/$',
@@ -16,10 +18,10 @@ urlpatterns = patterns('',
     (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/$',
      'fwc_mobile.mobile.views.club_page'),
      
-    (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/(?P<day>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/$',
+    (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/(?P<day>%s)/$' % DAYS,
      'fwc_mobile.mobile.views.club_class_day_page'),
                        
-    (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/(?P<day>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/(?P<classid>\d+)/$',
+    (r'^club/(?P<clubname>[\w \-&\(\)\+,]+)/(?P<day>%s)/(?P<classid>\d+)/$' % DAYS,
      'fwc_mobile.mobile.views.club_class_day_page'),
 
     (r'^clubs/$',

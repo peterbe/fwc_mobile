@@ -219,7 +219,11 @@ def club_class_day_page(request, clubname, day, classid=None):
         raise Http404('Could not find the club')
     
     if classid:
-        class_ = ClubClass.objects.get(pk=classid)
+        try:
+            class_ = ClubClass.objects.get(pk=classid)
+        except ClubClass.DoesNotExist:
+            # probably a deleted class
+            raise Http404("Class by that ID does not exist")
         classes = ClubClass.objects.filter(club=class_.club,
                                            day=class_.day,
                                            address1=class_.address1,
