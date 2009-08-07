@@ -148,8 +148,6 @@ def club_page(request, clubname):
         raise Http404('Could not find the club')
     
     class_days = _get_class_days(club)
-    from pprint import pprint
-    pprint(class_days)
     
     instructor = Instructor.objects.get(pk=club.head_instructor.id)
     assistant_instructor = None
