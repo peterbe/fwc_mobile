@@ -110,6 +110,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
   #'djangobile.context_processors.mobile',
+  'mobile.context_processors.context',
 )
 
 
@@ -123,3 +124,8 @@ try:
     GOOGLEMAPS_API_KEY
 except NameError:
     GOOGLEMAPS_API_KEY = open(HOME +'/m.fwckungfu.com.googlemaps_api.key').read()
+
+try:
+    YAHOO_API_KEY
+except NameError:
+    YAHOO_API_KEY = open(HOME +'/m.fwckungfu.com.yahoo_api.key').read()

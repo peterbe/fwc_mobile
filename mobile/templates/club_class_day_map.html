@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ club.name }} {{ day }} - {{ block.super }}{% endblock %}
+{% block header_title_outer %}<h4>{{ club.name }} - {{ day }}</h4>{% endblock %}
+
+{% block main %}
+
+
+{% if not first_class %}
+<p>Sorry, no class on this day.</p>
+{% endif %}
+
+
+<img src="{{ google_maps_url }}" />
+
+
+<p><a href="{{ club.get_absolute_url }}">Back to {{ club.name }} club page</a></p>
+{% endblock %}

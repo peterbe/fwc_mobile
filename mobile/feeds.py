@@ -1,7 +1,6 @@
 from random import randint
 import re
 from pprint import pprint
-from geopy import geocoders
 from collections import defaultdict
 
 from django.http import HttpResponse
@@ -18,18 +17,12 @@ from models import Club, ClubClass, Instructor
 from views import _get_class_days
 
 from ukpostcode import valid_uk_postcode, format_uk_postcode
-
+from geo import AddressNotFound, geopy_geocode
 
 # If this is true it will only find those with UK postcodes
 # This means that the searches are going to be much faster
 FIND_ONLY_UK_POSTCODES = True
 
-class AddressNotFound(Exception):
-    pass
-
-def geopy_geocode(address, google_key, domain='maps.google.co.uk', exactly_one=True):
-    g = geocoders.Google(google_key, domain=domain)
-    return g.geocode(address, exactly_one=exactly_one)
 
 
 def _address_list_to_geopoint(address_bits):

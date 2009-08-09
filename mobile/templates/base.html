@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <!--
        Site developed by Peter Bengtsson, peter@fry-it.com
-       of Fry-IT
+       of Fry-IT for Fujian White Crane
        www.fry-it.com 
   -->
   <head>
@@ -24,6 +24,9 @@
     {% block extracss %}{% endblock %}
     <title>{% block title %}FWC Kung Fu Club{% endblock %}</title>
     <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon" />
+    {% if iphone_version %}
+    <meta name="viewport" content="width=device-width; initial-scale=1.00; minimum-scale=1.00; maximum-scale=1.00; user-scalable=0;" />
+    {% endif %}
   </head>
   <body>
     <div id="header">
