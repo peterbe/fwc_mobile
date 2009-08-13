@@ -70,7 +70,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'pagination.middleware.PaginationMiddleware',
     'mobile.middleware.SpacelessMiddleware',
-    'djangobile.middleware.DjangoMobileMiddleware',
+    #'djangobile.middleware.DjangoMobileMiddleware',
     
 )
 
