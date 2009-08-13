@@ -157,7 +157,7 @@ class ClubKeyword(models.Model):
 
 class IdTable(models.Model):
     id_table_id = models.IntegerField(primary_key=True, db_column='ID_TABLE_ID') # Field name made lowercase.
-    table_name = models.CharField(unique=True, max_length=765, db_column='TABLE_NAME') # Field name made lowercase.
+    table_name = models.TextField(unique=True, max_length=765, db_column='TABLE_NAME') # Field name made lowercase.
     next_id = models.IntegerField(db_column='NEXT_ID') # Field name made lowercase.
     quantity = models.IntegerField(db_column='QUANTITY') # Field name made lowercase.
     class Meta:
@@ -327,7 +327,7 @@ class Pattern(models.Model):
 class StaticData(models.Model):
     chapter1 = models.CharField(unique=True, max_length=150)
     chapter2 = models.CharField(unique=True, max_length=150)
-    chapter3 = models.CharField(unique=True, max_length=600, blank=True)
+    chapter3 = models.TextField(unique=True, blank=True)
     class Meta:
         db_table = u'static_data'
 
