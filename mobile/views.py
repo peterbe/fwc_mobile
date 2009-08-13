@@ -1,5 +1,6 @@
 # python
 import re
+import urllib
 from pprint import pprint
 from datetime import datetime, timedelta
 
@@ -19,7 +20,9 @@ from django.contrib.sites.models import RequestSite
 from mobile.models import Club, ClubClass, Instructor, ClubAnnouncement,\
  Calendar
 from settings import DEBUG 
- 
+from ukpostcode import valid_uk_postcode, format_uk_postcode
+from geo import AddressNotFound, geopy_geocode, geopy_geocode_yahoo
+
 ## Constants ###################################################################
 
 if DEBUG:
@@ -28,6 +31,10 @@ else:
     CACHE_TIMEOUT = 60 * 60 * 24 # seconds (60*60 = 1 hour, 60*60*24 = 1 day)
 
 
+ONE_HOUR = 60 * 60
+ONE_DAY = ONE_HOUR * 24
+ONE_WEEK = ONE_DAY * 7
+ONE_MONTH = ONE_WEEK * 4
 
 ## Utility functions ###########################################################
 
@@ -137,7 +144,8 @@ def _get_class_days(club, use_cache=True):
     return [{'day':k.split()[0],
              'classes':v, 
              'venue':v[0].address2,
-             'day_url':v[0].get_absolute_url(without_time=True)}
+             'day_url': '%s%s/' % (v[0].get_absolute_url(without_time=True), v[0].id)
+                                   }
             for (k,v) in sorted(_class_days.items(), manual_sort)]
     
 
@@ -183,7 +191,7 @@ def _classes_today(club):
         
     # first split them up by address
     classes_today = {}
-    
+
     for each in _all_classes_today:
         if each.address1 in classes_today:
             classes_today[each.address1].append(each)
@@ -205,8 +213,6 @@ def _classes_today(club):
                 tonight_or_today = u'today'
             block['tonight_or_today'] = tonight_or_today
         blocks.append(block)
-    #print "BLOCKS"
-    #pprint(blocks)
     classes_today = blocks
     return locals()
     
@@ -234,14 +240,125 @@ def club_class_day_page(request, clubname, day, classid=None):
     try:
         first_class = classes[0]
         instructor = Instructor.objects.get(pk=first_class.club.head_instructor.id)
+        address1 = first_class.address1
+        address2 = first_class.address2
+        address3 = first_class.address3
+        address4 = first_class.address4
+        address5 = first_class.address5
+        
+        if valid_uk_postcode(address5.strip()):
+            post_code = format_uk_postcode(address5.strip())
+        elif address4 == 'Sweden':
+            # Gabor
+            post_code = "%s, %s" % (address3, address4)
+        elif address5 == 'Ireland' or address3.startswith('Dublin'):
+            post_code = "%s, %s, Ireland" % (address2, address3)
+        elif valid_uk_postcode(address4.strip()): # eg. FWC Kensington & Chelsea
+            post_code = format_uk_postcode(address4.strip())
+        else:
+            post_code = None
+            print repr(address1)
+            print repr(address2)
+            print repr(address3)
+            print repr(address4)
+            print repr(address5)
+            
+        if post_code:
+            map_link = "%smap/?" % request.build_absolute_uri()
+            #print repr(post_code)
+            map_link += urllib.urlencode(dict(q=post_code))
+        else:
+            map_link = first_class.map_link
+        
     except IndexError:
         # if this happens, there are no classes on this day and that can happen
         # if you go to a day that no longer exists (stale URL).
-        #return HttpResponseRedirect(club.get_absolute_url())
         first_class = None
+        
+        
 
     return _render('club_class_day.html', locals(), request)
     
+
+@cache_page(60 * 60 * 12) # 12 hours
+def club_class_day_map_page(request, clubname, day, classid=None):
+    club = _find_club(clubname)
+    if club is None:
+        raise Http404('Could not find the club')
+    
+    if classid:
+        try:
+            class_ = ClubClass.objects.get(pk=classid)
+        except ClubClass.DoesNotExist:
+            # probably a deleted class
+            raise Http404("Class by that ID does not exist")
+        classes = ClubClass.objects.filter(club=class_.club,
+                                           day=class_.day,
+                                           address1=class_.address1,
+                                           address2=class_.address2)
+        
+    else:
+        # The desperate way of doing it
+        classes = ClubClass.objects.filter(club=club, day__iexact=day).order_by('start_time')
+        
+    try:
+        first_class = classes[0]
+    except IndexError:
+        first_class = None
+        
+    if not request.GET.get('q'):
+        if first_class:
+            return HttpResponseRedirect(first_class.get_absolute_url())
+        else:
+            return HttpResponseRedirect('/')
+        
+    q = request.GET['q']
+    cache_key = 'marker_search_%s' % q.replace(' ','').lower()
+    marker_info = cache.get(cache_key)
+    if marker_info is None:
+        marker_info = _get_markers_by_search(q)
+        cache.set(cache_key, marker_info, ONE_MONTH)
+        
+    marker, (lat, lng) = marker_info
+                  
+    size = _get_map_size(request)
+    zoom = int(request.GET.get('zoom', 15))
+    query_args = dict(markers=marker, size=size, maptype='mobile', 
+                      key=settings.GOOGLEMAPS_API_KEY,
+                      sensor='false',
+                      center='%s,%s' % (lat, lng),
+                      zoom=zoom,
+                     )
+    google_maps_url = 'http://maps.google.com/staticmap?' + urllib.urlencode(query_args)
+    
+    if zoom < 19:
+        zoom_in_url = '?' + urllib.urlencode(dict(q=q, zoom=zoom+2))
+    if zoom > 11:
+        zoom_out_url = '?' + urllib.urlencode(dict(q=q, zoom=zoom-2))
+
+    return _render('club_class_day_map.html', locals(), request)
+
+def _get_map_size(request):
+    rc = RequestContext(request)
+    #print rc.get('iphone_version')
+    
+    return '300x300'
+
+def _get_markers_by_search(q):
+    marker = ''
+    try:
+        #q=q.replace(' ','').strip()
+        #print "IN", repr(q)
+        #place, (lat, lng) = geopy_geocode(q)
+        #print "OUT", place, (lat, lng)
+        place, (lat, lng) = geopy_geocode_yahoo(q)
+        #print "OUT", place, (lat, lng)
+    except ValueError, msg:
+        raise AddressNotFound, address_search
+    marker = '%s,%s,green' % (lat, lng)
+    return marker, (lat, lng)
+
+
 
 def _find_instructor(name):
     name = name.lower().strip()

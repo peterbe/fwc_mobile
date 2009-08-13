@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ club.name }} {{ day }} - {{ block.super }}{% endblock %}
+{% block header_title_outer %}<h4>{{ club.name }} - {{ day }}</h4>{% endblock %}
+
+{% block main %}
+
+
+{% if not first_class %}
+<p>Sorry, no class on this day.</p>
+{% endif %}
+
+
+<img src="{{ google_maps_url }}" />
+<br/>
+{% if zoom_in_url %}
+<a href="{{ zoom_in_url }}">zoom in +</a><br/>
+{% endif %}
+{% if zoom_out_url %}
+<a href="{{ zoom_out_url }}">zoom out -</a><br/>
+{% endif %}
+
+
+<p>
+<a href="..">Back to class and venue page</a><br/>
+<a href="{{ club.get_absolute_url }}">Back to {{ club.name }} club page</a>
+</p>
+{% endblock %}

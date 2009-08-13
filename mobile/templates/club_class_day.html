@@ -29,8 +29,8 @@
     {{ first_class.address2 }}<br/>
     {{ first_class.address3 }}<br/>
     {{ first_class.address4 }} {{ first_class.address5 }}<br/>
-    {% if first_class.maplink %}
-      <a href="{{ first_class.maplink }}">Map link</a><br/>
+    {% if map_link %}
+      <a href="{{ map_link }}" rel="nofollow">View on map</a><br/>
     {% endif %}
   </dd>
   
