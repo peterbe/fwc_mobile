@@ -268,7 +268,9 @@ def club_class_day_page(request, clubname, day, classid=None):
             #print repr(post_code)
             map_link += urllib.urlencode(dict(q=post_code))
         else:
-            map_link = first_class.map_link
+            map_link = first_class.map_link.strip()
+            if not map_link.startswith('http'):
+                map_link = 'http://%s' % map_link
         
     except IndexError:
         # if this happens, there are no classes on this day and that can happen
