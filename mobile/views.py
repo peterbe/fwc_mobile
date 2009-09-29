@@ -356,7 +356,7 @@ def _get_markers_by_search(q):
         place, (lat, lng) = geopy_geocode_yahoo(q)
         #print "OUT", place, (lat, lng)
     except ValueError, msg:
-        raise AddressNotFound, address_search
+        raise AddressNotFound(q)
     marker = '%s,%s,green' % (lat, lng)
     return marker, (lat, lng)
 
