@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block main %}
+{% if last_visited_club %}
+  <dl>
+    <dt>Last visited club:</dt>
+    <dd><a href="{{ last_visited_club.get_absolute_url }}">{{ last_visited_club.name }}</a></dd>
+    
+    {% if classes_today %}
+    {% for each in classes_today %}
+      
+      <dt>Classes {{ each.tonight_or_today}} at
+      <a href="{{ each.classes_today_url }}">{% now "l" %} - {{ each.classes_today_venue }}</a>:</dt>
+      {% for class in each.classes_today %}
+        <dd>{{ class.style }},
+        {% if class.too_late_today %}
+          <strike>{{ class.start_time }} - {{ class.end_time }}</strike>
+          <small>(already started)</small>
+        {% else %}
+          {{ class.start_time }} - {{ class.end_time }}
+        {% endif %}
+        
+        </dd>
+      {% endfor %}
+      
+    {% endfor %}
+    {% endif %}
+    
+  </dl>
+{% endif %}
+
+
+{% load cache %}
+{% cache 3600 template_home_clubs %}
+
+<p><strong>Clubs</strong></p>
+
+<dl>
+  {% for club in clubs %}
+    <dt><a href="{{ club.get_absolute_url }}">{{ club.name }}</a></dt>
+    <dd>{{ club.head_instructor.full_name }}</dd>
+  {% endfor %}
+</dl>
+
+{% endcache %}
+
+{% endblock %}

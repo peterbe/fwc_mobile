@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:v="urn:schemas-microsoft-com:vml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>FWC Kung classes map</title>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ google_key }}"
+      type="text/javascript"></script>
+    <script type="text/javascript"> 
+   
+    var map;
+    var geoXml;
+    var toggleState = 1;
+
+	function initialize() {
+  	  if (GBrowserIsCompatible()) {
+  	    geoXml = new GGeoXml("{{ geo_xml_url }}");
+        map = new GMap2(document.getElementById("map_canvas"));
+        map.setCenter(new GLatLng(51.5087157485, -0.128424167633), 9); // trafalgar square
+        map.addControl(new GLargeMapControl());
+        map.addControl(new GLargeMapControl());
+        map.addOverlay(geoXml);
+  	  }
+	} 
+    </script>
+  </head>
+
+  <body onload="initialize()">
+
+    <div id="map_canvas" style="width: 840px; height: 780px; float:left; border: 1px solid black;"></div>
+    </div>
+    <br clear="all"/>
+    <br/>
+  </body>
+
+</html>
