@@ -9,7 +9,7 @@
 <p>Sorry, no class on this day.</p>
 {% endif %}
 
-
+{% if google_maps_url %}
 <img src="{{ google_maps_url }}" />
 <br/>
 {% if zoom_in_url %}
@@ -18,7 +18,9 @@
 {% if zoom_out_url %}
 <a href="{{ zoom_out_url }}">zoom out -</a><br/>
 {% endif %}
-
+{% else %}
+<p><em>Sorry, unable to connect to Google Maps at the moment</em></p>
+{% endif %}
 
 <p>
 <a href="..">Back to class and venue page</a><br/>

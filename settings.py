@@ -7,7 +7,7 @@ HOME = '/home/django/fwc_mobile'
 
 
 ADMINS = (
-     ('Peter Bengtsson', 'peter@fry-it.com'),
+     ('Peter Bengtsson', 'mail@peterbe.com'),
 )
 
 EMAIL_HOST = 'mail.fry-it.com'
@@ -16,12 +16,6 @@ EMAIL_SUBJECT_PREFIX = '[FWC Mobile]'
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'      # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'fwckungfu'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'whitecrane'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'Blu_888_wh1t'         # Not used with sqlite3.
-DATABASE_HOST = 'www.fwckungfu.com'             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = '3306'             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -71,7 +65,6 @@ MIDDLEWARE_CLASSES = (
     'pagination.middleware.PaginationMiddleware',
     'mobile.middleware.SpacelessMiddleware',
     #'djangobile.middleware.DjangoMobileMiddleware',
-    
 )
 
 ROOT_URLCONF = 'fwc_mobile.urls'
@@ -82,7 +75,6 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     HOME + '/mobile/templates',
     HOME + '/templates',
-    
 )
 
 INSTALLED_APPS = (

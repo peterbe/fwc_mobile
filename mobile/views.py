@@ -1,6 +1,7 @@
 # python
 import re
 import urllib
+from urllib2 import HTTPError
 from pprint import pprint
 from datetime import datetime, timedelta
 
@@ -318,25 +319,29 @@ def club_class_day_map_page(request, clubname, day, classid=None):
     cache_key = 'marker_search_%s' % q.replace(' ','').lower()
     marker_info = cache.get(cache_key)
     if marker_info is None:
-        marker_info = _get_markers_by_search(q)
-        cache.set(cache_key, marker_info, ONE_MONTH)
+        try:
+            marker_info = _get_markers_by_search(q)
+            cache.set(cache_key, marker_info, ONE_MONTH * 12)
+        except HTTPError:
+            marker_info = None
+            
+    if marker_info:
+        marker, (lat, lng) = marker_info
+                      
+        size = _get_map_size(request)
+        zoom = int(request.GET.get('zoom', 15))
+        query_args = dict(markers=marker, size=size, maptype='mobile', 
+                          key=settings.GOOGLEMAPS_API_KEY,
+                          sensor='false',
+                          center='%s,%s' % (lat, lng),
+                          zoom=zoom,
+                         )
+        google_maps_url = 'http://maps.google.com/staticmap?' + urllib.urlencode(query_args)
         
-    marker, (lat, lng) = marker_info
-                  
-    size = _get_map_size(request)
-    zoom = int(request.GET.get('zoom', 15))
-    query_args = dict(markers=marker, size=size, maptype='mobile', 
-                      key=settings.GOOGLEMAPS_API_KEY,
-                      sensor='false',
-                      center='%s,%s' % (lat, lng),
-                      zoom=zoom,
-                     )
-    google_maps_url = 'http://maps.google.com/staticmap?' + urllib.urlencode(query_args)
-    
-    if zoom < 19:
-        zoom_in_url = '?' + urllib.urlencode(dict(q=q, zoom=zoom+2))
-    if zoom > 11:
-        zoom_out_url = '?' + urllib.urlencode(dict(q=q, zoom=zoom-2))
+        if zoom < 19:
+            zoom_in_url = '?' + urllib.urlencode(dict(q=q, zoom=zoom+2))
+        if zoom > 11:
+            zoom_out_url = '?' + urllib.urlencode(dict(q=q, zoom=zoom-2))
 
     return _render('club_class_day_map.html', locals(), request)
 
