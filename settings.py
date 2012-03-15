@@ -1,16 +1,28 @@
 # Django settings for fwc_mobile project.
 
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
+import os
+HERE = os.path.abspath(os.path.dirname(__file__))
+path = lambda *x: os.path.join(HERE, *x)
 
-HOME = '/home/django/fwc_mobile'
+DEBUG = TEMPLATE_DEBUG = False
 
+HOME = HERE
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 ADMINS = (
-     ('Peter Bengtsson', 'mail@peterbe.com'),
 )
 
-EMAIL_HOST = 'mail.fry-it.com'
+EMAIL_HOST = ''
 
 EMAIL_SUBJECT_PREFIX = '[FWC Mobile]'
 
@@ -49,13 +61,13 @@ MEDIA_URL = ''
 ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '3xol3+olj#udenc)i0qxq_=it!h*jihxi!&v078gla@qx1cnmb'
+SECRET_KEY = 'you must set this in your settings_local.py'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -67,14 +79,15 @@ MIDDLEWARE_CLASSES = (
     #'djangobile.middleware.DjangoMobileMiddleware',
 )
 
-ROOT_URLCONF = 'fwc_mobile.urls'
+#ROOT_URLCONF = 'fwc_mobile.urls'
+ROOT_URLCONF = '%s.urls' % os.path.basename(HERE)
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    HOME + '/mobile/templates',
-    HOME + '/templates',
+    path('mobile', '/templates'),
+    path('templates'),
 )
 
 INSTALLED_APPS = (
@@ -88,21 +101,34 @@ INSTALLED_APPS = (
 
 TEMPLATE_STRING_IF_INVALID = ''
 
-# I'm going to experiment with CACHE_BACKEND. 
-# Starting with RAM and we'll see if this bloats and if so
-# if memcache is better. Apparently memcache is ...
-# "By far the fastest, most efficient type of cache available to Django"
-# but why would it be any faster than locmem??
-CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': 500,
+        'KEY_PREFIX': 'fwcm',
+    }
+}
 
 
-TEMPLATE_CONTEXT_PROCESSORS = (
+
+xxxTEMPLATE_CONTEXT_PROCESSORS = (
   'django.core.context_processors.auth',
   'django.core.context_processors.debug',
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
-  #'djangobile.context_processors.mobile',
   'mobile.context_processors.context',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+ 'django.contrib.auth.context_processors.auth',
+ 'django.core.context_processors.debug',
+ 'django.core.context_processors.i18n',
+ 'django.core.context_processors.media',
+ 'django.core.context_processors.static',
+ 'django.core.context_processors.tz',
+ 'mobile.context_processors.context',
+# 'django.contrib.messages.context_processors.messages'
 )
 
 
